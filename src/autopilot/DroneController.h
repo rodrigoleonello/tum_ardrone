@@ -23,7 +23,7 @@
  
  
  
-
+#include "ros/ros.h"
 #include "TooN/se3.h"
 #include <queue>
 #include "geometry_msgs/Twist.h"
@@ -59,7 +59,42 @@ class DroneController
 {
 private:
 	ControlCommand lastSentControl;
+
+    bool aux;
+	bool aux1;
+	bool aux2;
+	bool aux3;
+	bool aux4;
+	bool aux5;
+	double tempo;
+	double tempo1;
+
+	double droll;
+	double dpitch;
+	double roll_before;
+	double pitch_before;
+
+    //test quadratic signal
+	double aux_yaw;
+	double aux_roll;
+	double aux_pitch;
+	double aux_gaz;
+	bool chavear1;
+	bool chavear2;
+	bool chavear3;
+	bool chavear4;
+	int timer1;
+	int timer2;
+	int timer3;
+	int timer4;
+
+    ros::NodeHandle nh_;
+    ros::Publisher setpoint_pub;
+	std::string setpoint_channel;
+
 	
+	TooN::Vector<4> new_int_err;
+
 	// currentTarget.
 	DronePosition target;
 	bool targetValid;
@@ -77,12 +112,15 @@ private:
 	double targetSetAtClock;
 	ControlCommand hoverCommand;
 
-
-
 	// filled with info (on update)
 	bool  ptamIsGood;
 	double scaleAccuracy;
 	void calcControl(TooN::Vector<4> new_err, TooN::Vector<4> d_error, double yaw);
+	// void calcControl(double yaw, TooN::Vector<12> states);
+	// void calcControl(double yaw, TooN::Vector<16> states, TooN::Vector<4> new_err);
+
+	// LQR + PID
+	// void calcControl(double yaw, TooN::Vector<16> states, TooN::Vector<4> new_err, TooN::Vector<4> d_error);
 
 public:
 

@@ -19,7 +19,6 @@
  */
  
  
- 
 #include "ControlNode.h"
 #include "ros/ros.h"
 #include "ros/callback_queue.h"
@@ -66,7 +65,6 @@ ControlNode::ControlNode()
 	minPublishFreq = valFloat;
 	cout << "set minPublishFreq to " << valFloat << "ms"<< endl;
 
-
 	// other internal vars
 	logfileControl = 0;
 	hoverCommand.gaz = hoverCommand.pitch = hoverCommand.roll = hoverCommand.yaw = 0;
@@ -97,8 +95,11 @@ ControlNode::ControlNode()
 	parameter_referenceZero = DronePosition(TooN::makeVector(0,0,0),0);
 	parameter_MaxControl = 1;
 	parameter_InitialReachDist = 0.2;
+	// parameter_InitialReachDist = 0;
 	parameter_StayWithinDist = 0.5;
+	// parameter_StayWithinDist = 0.1;
 	parameter_StayTime = 2;
+	// parameter_StayTime = 0;
 	isControlling = false;
 	currentKI = NULL;
 	lastSentControl = ControlCommand(0,0,0,0);
@@ -251,7 +252,6 @@ void ControlNode::popNextCommand(const tum_ardrone::filter_stateConstPtr statePt
 				);
 			currentKI->setPointers(this,&controller);
 			commandUnderstood = true;
-
 		}
 
 		// moveBy
@@ -413,10 +413,14 @@ void ControlNode::toogleLogging()
 void ControlNode::sendControlToDrone(ControlCommand cmd)
 {
 	geometry_msgs::Twist cmdT;
-	cmdT.angular.z = -cmd.yaw;
+	cmdT.angular.z = cmd.yaw;
+	// cmdT.angular.z = 0;
 	cmdT.linear.z = cmd.gaz;
-	cmdT.linear.x = -cmd.pitch;
-	cmdT.linear.y = -cmd.roll;
+	// cmdT.linear.z = 0;
+	cmdT.linear.x = cmd.pitch;
+	// cmdT.linear.x = 0;
+	cmdT.linear.y = cmd.roll;
+	// cmdT.linear.y = sin((2*3.141592/5)*i); //+ 0.3*sin(2*3.141592*i);
 
 	// assume that while actively controlling, the above for will never be equal to zero, so i will never hover.
 	cmdT.angular.x = cmdT.angular.y = 0;

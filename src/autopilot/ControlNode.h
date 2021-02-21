@@ -106,6 +106,8 @@ private:
 	double parameter_InitialReachDist;
 	double parameter_StayWithinDist;
 
+	double i;
+
 	// functions
 	void startControl();
 	void stopControl();
