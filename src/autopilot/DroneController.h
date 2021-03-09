@@ -66,6 +66,7 @@ private:
 	bool aux3;
 	bool aux4;
 	bool aux5;
+	double after;
 	double tempo;
 	double tempo1;
 
@@ -115,9 +116,9 @@ private:
 	// filled with info (on update)
 	bool  ptamIsGood;
 	double scaleAccuracy;
-	void calcControl(TooN::Vector<4> new_err, TooN::Vector<4> d_error, double yaw);
+	// void calcControl(TooN::Vector<4> new_err, TooN::Vector<4> d_error, double yaw);
 	// void calcControl(double yaw, TooN::Vector<12> states);
-	// void calcControl(double yaw, TooN::Vector<16> states, TooN::Vector<4> new_err);
+	void calcControl(double yaw, TooN::Vector<16> states, TooN::Vector<4> new_err);
 
 	// LQR + PID
 	// void calcControl(double yaw, TooN::Vector<16> states, TooN::Vector<4> new_err, TooN::Vector<4> d_error);
