@@ -108,11 +108,11 @@ double angleFromTo2(double angle, double min, double sup)
 // 	// target.yaw = (-3.14/6)*sin(0.4*time)*180/3.141592;
 
 // 	// Teste do circulo
-// 	// double time = getMS()/1000.0;
-//     // target.pos[0] = 0.6*sin(0.5*time);
-// 	// target.pos[1] = 0.6*cos(0.5*time);
-// 	// target.pos[2] = 0.7;
-// 	// target.yaw = 0;
+// 	double time = getMS()/1000.0;
+//     target.pos[0] = 0.8*sin(0.5*time);
+// 	target.pos[1] = 0.8*cos(0.5*time);
+// 	target.pos[2] = 0.7;
+// 	target.yaw = 0;
 
 
 // 	// calculate (new) errors.
@@ -173,28 +173,28 @@ ControlCommand DroneController::update(tum_ardrone::filter_stateConstPtr state)
 	scaleAccuracy = state->scaleAccuracy;
 
 	// Teste do 8
-	if(aux)
-    {
-	  double time = getMS()/1000.0;
-       target.pos[0] = 0.5*sin(0.8*time);
-	//    target.pos[0] = 0;
-	   target.pos[1] = sin(0.4*time);
-	//    target.pos[1] = 0;
-	   target.pos[2] = 0.7 + 0.5*sin(0.4*time);
-	//    target.pos[2] = 0.7;
-	   target.yaw = (-3.14/12)*sin(0.4*time)*180/3.141592;
-	//    target.yaw = 0;
-	}
-
-	// Teste do circulo
 	// if(aux)
     // {
 	//   double time = getMS()/1000.0;
-    //   target.pos[0] = 0.6*sin(0.8*time);
-	//   target.pos[1] = 0.6*cos(0.8*time);
-	//   target.pos[2] = 0.7;
-	//   target.yaw = 0;
+    //    target.pos[0] = sin(0.8*time);
+	// //  target.pos[0] = 0;
+	//    target.pos[1] = sin(0.4*time);
+	// //    target.pos[1] = 0;
+	//    target.pos[2] = 0.7 + 0.5*sin(0.4*time);
+	// //  target.pos[2] = 0.7;
+	// //   target.yaw = (-3.14/12)*sin(0.4*time)*180/3.141592;
+	//    target.yaw = 0;
 	// }
+
+	// Teste do circulo
+	if(aux)
+    {
+	  double time = getMS()/1000.0;
+      target.pos[0] = 0.8*sin(0.8*time);
+	  target.pos[1] = 0.8*cos(0.8*time);
+	  target.pos[2] = 0.7;
+	  target.yaw = 0;
+	}
 
 	// Teste sen() em Z
 	// if(aux)
@@ -638,64 +638,64 @@ void i_term_increase(double& i_term, double new_err, double cap)
 // 		}
 
 //     // // Test quadratic signal
-// 	if (timer1 == 120)
-// 	{
-// 		chavear1 = !chavear1;
-// 		timer1 = 0;
-// 	}
-// 	if(!chavear1){
-// 	  aux_yaw = 0.3;
-// 	  lastSentControl.yaw = 0;
-// 	} else {
-// 	  aux_yaw = -0.3;
-// 	  lastSentControl.yaw = 0;
-// 	}
-// 	timer1+=1;
+// 	// if (timer1 == 120)
+// 	// {
+// 	// 	chavear1 = !chavear1;
+// 	// 	timer1 = 0;
+// 	// }
+// 	// if(!chavear1){
+// 	//   aux_yaw = 0.3;
+// 	//   lastSentControl.yaw = 0;
+// 	// } else {
+// 	//   aux_yaw = -0.3;
+// 	//   lastSentControl.yaw = 0;
+// 	// }
+// 	// timer1+=1;
 
-// 	if (timer2 == 100)
-// 	{
-// 		chavear2 = !chavear2;
-// 		timer2 = 0;
-// 	}
-// 	if(!chavear2){
-// 	  aux_roll = 0.2;
-// 	  lastSentControl.roll = 0;
-// 	} else {
-// 	  aux_roll = -0.2;
-// 	  lastSentControl.roll = 0;
-// 	}
-// 	timer2+=1;
+// 	// if (timer2 == 130)
+// 	// {
+// 	// 	chavear2 = !chavear2;
+// 	// 	timer2 = 0;
+// 	// }
+// 	// if(!chavear2){
+// 	//   aux_roll = 0.15;
+// 	//   lastSentControl.roll = 0;
+// 	// } else {
+// 	//   aux_roll = -0.15;
+// 	//   lastSentControl.roll = 0;
+// 	// }
+// 	// timer2+=1;
 
-// 	if (timer3 == 100)
-// 	{
-// 		chavear3 = !chavear3;
-// 		timer3 = 0;
-// 	}
-// 	if(!chavear3){
-// 	  aux_pitch = 0.2;
-// 	  lastSentControl.pitch = 0;
-// 	} else {
-// 	  aux_pitch = -0.2;
-// 	  lastSentControl.pitch = 0;
-// 	}
-// 	timer3+=1;
+// 	// if (timer3 == 120)
+// 	// {
+// 	// 	chavear3 = !chavear3;
+// 	// 	timer3 = 0;
+// 	// }
+// 	// if(!chavear3){
+// 	//   aux_pitch = 0.10;
+// 	//   lastSentControl.pitch = aux_pitch;
+// 	// } else {
+// 	//   aux_pitch = -0.15;
+// 	//   lastSentControl.pitch = aux_pitch;
+// 	// }
+// 	// timer3+=1;
 
-// 	if (timer4 == 120)
-// 	{
-// 		chavear4 = !chavear4;
-// 		timer4 = 0;
-// 	}
-// 	if(!chavear4){
-// 	  aux_gaz = 0.3;
-// 	  lastSentControl.gaz = aux_gaz;
-// 	} else {
-// 	  aux_gaz = -0.3;
-// 	  lastSentControl.gaz = aux_gaz;
-// 	}
-// 	timer4+=1;
+// 	// if (timer4 == 120)
+// 	// {
+// 	// 	chavear4 = !chavear4;
+// 	// 	timer4 = 0;
+// 	// }
+// 	// if(!chavear4){
+// 	//   aux_gaz = 0.3;
+// 	//   lastSentControl.gaz = 0;
+// 	// } else {
+// 	//   aux_gaz = -0.3;
+// 	//   lastSentControl.gaz = 0;
+// 	// }
+// 	// timer4+=1;
 
 // 	// YAW
-// 	// lastSentControl.yaw = Kp_yaw * p_term[3] + Kd_yaw * d_term[3];	// yaw can be translated directly
+// 	lastSentControl.yaw = Kp_yaw * p_term[3] + Kd_yaw * d_term[3];	// yaw can be translated directly
 //     // double i = ros::Time::now().toSec();
 // 	// lastSentControl.yaw = 0;
 // 	// lastSentControl.yaw = std::min(max_yaw,std::max(-max_yaw,(double)(lastSentControl.yaw)));
@@ -713,19 +713,19 @@ void i_term_increase(double& i_term, double new_err, double cap)
 // 	double cX_i = Ki_rp * i_term[0];
 // 	double cY_i = Ki_rp * i_term[1];
 
-// 	// lastSentControl.roll = cX_p + cX_d + cX_i;
-// 	// lastSentControl.pitch = cY_p + cY_d + cY_i;
+// 	lastSentControl.roll = cX_p + cX_d + cX_i;
+// 	lastSentControl.pitch = cY_p + cY_d + cY_i;
 
 // 	// clip
 // 	// double i = ros::Time::now().toSec();
-// 	// lastSentControl.roll = 0.5*sin(1.256*i)+0.3*sin(6.28*i);
+// 	// lastSentControl.roll = 0.2*sin(1.256*i)+0.1*sin(6.28*i);
 // 	// lastSentControl.roll = std::min(max_rp,std::max(-max_rp,(double)(lastSentControl.roll)));
 // 	// lastSentControl.roll = 0;
 // 	// std::cout<<"roll"<<lastSentControl.roll<<std::endl;
 //     // lastSentControl.pitch = 0.5*sin(1.256*i)+0.3*sin(6.28*i);
 	
 // 	// lastSentControl.pitch = std::min(max_rp,std::max(-max_rp,(double)(lastSentControl.pitch)));
-// 	// lastSentControl.pitch = 0;
+// 	// lastSentControl.pitch = 0.2*sin(1.256*i)+0.1*sin(6.28*i);;
 // 	// std::cout<<"pitch"<<lastSentControl.pitch<<std::endl;
 // 	// GAZ
 // 	double gazP = Kp_gaz * p_term[2];
@@ -735,9 +735,9 @@ void i_term_increase(double& i_term, double new_err, double cap)
 // 	// if(lastSentControl.gaz > 0) lastSentControl.gaz *= rise_fac;
 //     // double i = ros::Time::now().toSec();
 // 	// lastSentControl.gaz = 0.5*sin(1.256*i)+0.3*sin(6.28*i);
-// 	// lastSentControl.gaz = gazP + gazD + gazI;
+// 	lastSentControl.gaz = gazP + gazD + gazI;
 // 	// lastSentControl.gaz = std::min(max_gaz_rise,std::max(-max_gaz_rise,(double)(lastSentControl.gaz)));
-// 	// lastSentControl.gaz = 0.3*sin(1.256*i)+0.2*sin(6.28*i);
+// 	// lastSentControl.gaz = 0;
 // 	// std::cout<<"gaz"<<lastSentControl.gaz<<std::endl;
 
 // 	logInfo = TooN::makeVector(
@@ -752,6 +752,7 @@ void i_term_increase(double& i_term, double new_err, double cap)
 // }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 //LQR calcControl 1
 void DroneController::calcControl(double yaw, TooN::Vector<16> states, TooN::Vector<4> new_err)
@@ -771,11 +772,15 @@ void DroneController::calcControl(double yaw, TooN::Vector<16> states, TooN::Vec
 	// vector_k11 = TooN::makeVector(0, 0, -2.38, -0.79, 2.47, 0.73, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0); // fase3 - teste1 - muito ruim, angulos agressivos e Z sem conseguir seguir referência (sinais saturados)
 	// vector_k11 = TooN::makeVector(0, 0, -4.5, -1.04, 1.48, 0.06, 0, 0, 0, 0, 0, 0, 0, 4.47, 0, 0); // fase3 - teste2 - muito ruim, assim como o anterior
 	// vector_k11 = TooN::makeVector(0, 0, -0.78, -0.22, 0.31, 0.011, 0, 0, 0, 0, 0, 0, 0, 0.28, 0, 0); // fase4 - teste1 - ação intergral com Z sem saturar (Z muito lento!)
-    vector_k11 = TooN::makeVector(0, 0, -1.58, -0.42, 0.80, 0.03, 0, 0, 0, 0, 0, 0, 0, 0.89, 0, 0); // fase5 - teste 2 - bom desempenho no teste do circulo <------- Estava sendo utilizado por ultimo!!
+    // vector_k11 = TooN::makeVector(0, 0, -1.58, -0.42, 0.80, 0.03, 0, 0, 0, 0, 0, 0, 0, 0.89, 0, 0); // fase5 - teste 2 - bom desempenho no teste do circulo <------- Estava sendo utilizado por ultimo!!
 	// vector_k11 = TooN::makeVector(0, 0, -2.23, -0.56, 1.03, 0.037, 0, 0, 0, 0, 0, 0, 0, 1.54, 0, 0); // fase5 - teste 1 
 	// vector_k11 = TooN::makeVector(0.0000, 0.0000, -2.8832, -0.6539, 2.0297, 0.3160, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 3.1623, 0.0000, 0.0000); // controlador humberto
 	// vector_k11 = TooN::makeVector(0, 0, -1.44, -0.96, 1.87, 0.32, 0, 0, 0, 0, 0, 0, 0, 1.0, 0, 0);
-
+	// vector_k11 = TooN::makeVector(0, 0, -1.59, -0.98, 1.90, 0.32, 0, 0, 0, 0, 0, 0, 0, 1.04, 0, 0); //fase7 - teste1 - y - pitch!!!
+	// vector_k11 = TooN::makeVector(0, 0, -1.51, -0.97, 2.74, 0.59, 0, 0, 0, 0, 0, 0, 0, 1.04, 0, 0); //fase8 - nova ident roll e pitch
+    
+	// gazebo
+	vector_k11 = TooN::makeVector(0, 0, -1.5467, -1.0066, 1.9519, 0.3311, 0, 0, 0, 0, 0, 0, 0, 1.0954, 0, 0); //fase9
 
 	// roll
 	TooN::Vector<> vector_k21(16);
@@ -791,11 +796,14 @@ void DroneController::calcControl(double yaw, TooN::Vector<16> states, TooN::Vec
 	// vector_k21 = TooN::makeVector(2.29, 1.29, 0, 0, 0, 0, 3.38, 0.68, 0, 0, 0, 0, -1, 0, 0, 0);
 	// vector_k21 = TooN::makeVector(4.43, 1.52, 0, 0, 0, 0, 2.13, 0.06, 0, 0, 0, 0, -4.47, 0, 0, 0);
 	// vector_k21 = TooN::makeVector(0.71, 0.37, 0, 0, 0, 0, 0.58, 0.014, 0, 0, 0, 0, -0.31, 0, 0, 0);
-	vector_k21 = TooN::makeVector(1.49, 0.65, 0, 0, 0, 0, 0.68, 0.02, 0, 0, 0, 0, -1.0, 0, 0, 0);
+	// vector_k21 = TooN::makeVector(1.49, 0.65, 0, 0, 0, 0, 0.68, 0.02, 0, 0, 0, 0, -1.0, 0, 0, 0);
     // vector_k21 = TooN::makeVector(2.16, 0.86, 0, 0, 0, 0, 2.23, 0.57, 0, 0, 0, 0, -1.0, 0, 0, 0);
 	// vector_k21 = TooN::makeVector(2.8438, 0.9238, 0.0000, 0.0000, 0.0000, 0.0000, 2.3328, 0.3159, 0.0000, 0.0000, 0.0000, 0.0000, -3.1623, 0.0000, 0.0000, 0.0000);
     // vector_k21 = TooN::makeVector(2.12, 1.05, 0, 0, 0, 0, 1.67, 0.04, 0, 0, 0, 0, -1.82, 0, 0, 0);
+	// vector_k21 = TooN::makeVector(1.88, 0.97, 0, 0, 0, 0, 1.56, 0.04, 0, 0, 0, 0, -1.53, 0, 0, 0); //fase7 - teste1 - x - roll
+	// vector_k21 = TooN::makeVector(1.46, 0.81, 0, 0, 0, 0, 2.19, 0.34, 0, 0, 0, 0, -1.09, 0, 0, 0); //fase8 - teste1 - x - roll
 
+	vector_k21 = TooN::makeVector(1.3912, 0.7963, 0, 0, 0, 0, 1.3262, 0.0328, 0, 0, 0, 0, -1.0000, 0, 0, 0); //fase9
 
 	// Z
 	TooN::Vector<> vector_k31(16);
@@ -847,8 +855,8 @@ void DroneController::calcControl(double yaw, TooN::Vector<16> states, TooN::Vec
 	// lastSentControl.yaw = std::min(max_yaw,std::max(-max_yaw,(double)(lastSentControl.yaw)));
 
     // ROLL and PITCH
-	double roll_cmd = vector_k21*states;
 	double pitch_cmd = vector_k11*states;
+	double roll_cmd = vector_k21*states;
 
 	// if(roll_cmd > 1 || roll_cmd < -1)
 	// {
