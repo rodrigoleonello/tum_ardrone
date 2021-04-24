@@ -17,19 +17,21 @@
  *  You should have received a copy of the GNU General Public License
  *  along with tum_ardrone.  If not, see <http://www.gnu.org/licenses/>.
  */
- 
- 
 
 #include "DroneController.h"
 #include "gvars3/instances.h"
 #include "../HelperFunctions.h"
 #include "ControlNode.h"
+#include <numeric>
 
 DroneController::DroneController(void)
 {
 	// publisher
 	setpoint_channel = nh_.resolveName("setpoint");
-	setpoint_pub = nh_.advertise<geometry_msgs::Twist>(setpoint_channel,1);
+	setpoint_pub = nh_.advertise<geometry_msgs::Twist>(setpoint_channel,100);
+
+    derivative_channel = nh_.resolveName("derivative");
+	derivative_pub = nh_.advertise<geometry_msgs::Twist>(derivative_channel,100);
 	
 	target = DronePosition(TooN::makeVector(0.0,0.0,0.0),0.0);
 	targetValid = false;
@@ -49,6 +51,8 @@ DroneController::DroneController(void)
 	// LQR variables
 	droll = 0;
 	dpitch = 0;
+	droll_before = 0;
+	dpitch_before = 0;
 	roll_before = 0;
 	pitch_before = 0;
 	
@@ -156,17 +160,63 @@ ControlCommand DroneController::update(tum_ardrone::filter_stateConstPtr state)
 
 	// estimate Derivative using function
 	// df(x)/dx~=(f(x)-f(x-1))/e
-	// double e = getMS()/1000.0 - lastTimeStamp; 
-	double e = 0.032;
+	double e = getMS()/1000.0 - lastTimeStamp; 
+	// double e = 0.032;
+	// droll = (droll_before + (pose[0] - roll_before)/e)/2;
+	// dpitch = (dpitch_before + (pose[1] - pitch_before)/e)/2;
 	droll = (pose[0] - roll_before)/e;
 	dpitch = (pose[1] - pitch_before)/e;
 
-	//make vector
-	TooN::Vector<3> speed_pose = TooN::makeVector(droll, dpitch, (state->dyaw)*3.141592/180);
-	// std::cout<<"state_derivada_yaw"<<state->dyaw<<std::endl;
-
     roll_before = (state->roll)*3.141592/180;
 	pitch_before = (state->pitch)*3.141592/180;
+
+    if(roll_queue.size() < 10 || pitch_queue.size() < 10)
+	{
+	  roll_queue.push_back(droll);
+	  pitch_queue.push_back(dpitch);
+
+	  return lastSentControl;	
+	}
+
+	roll_queue.erase(roll_queue.begin());
+	roll_queue.push_back(droll);
+
+	pitch_queue.erase(pitch_queue.begin());
+	pitch_queue.push_back(dpitch);
+  
+    // média movel
+	double roll_average = 0;
+	double pitch_average = 0;
+	for(int i=0;i<roll_queue.size();i++)
+	{
+		roll_average += roll_queue[i];
+		pitch_average += pitch_queue[i];
+	}
+	droll = roll_average/roll_queue.size();
+	dpitch = pitch_average/pitch_queue.size();
+
+	//Filtro golay
+	// // Window size is 2*m+1
+    // const size_t m = 3;
+    // // Polynomial Order
+    // const size_t n = 2;
+    // // Initial Point Smoothing (ie evaluate polynomial at first point in the window)
+    // // Points are defined in range [-m;m]
+    // const size_t t = m;
+    // // Derivation order? 0: no derivation, 1: first derivative, 2: second derivative...
+    // const int d = 0;
+	// gram_sg::SavitzkyGolayFilter first_derivative_filter1(m, t, n, d);
+    // // Should be =.1
+    // droll = first_derivative_filter1.filter(roll_queue);
+	// gram_sg::SavitzkyGolayFilter first_derivative_filter2(m, t, n, d);
+    // // Should be =.1
+    // dpitch = first_derivative_filter2.filter(pitch_queue);
+
+	//make vector
+	TooN::Vector<3> speed_pose = TooN::makeVector(droll, dpitch, (state->dyaw)*3.141592/180);
+
+    // droll_before = droll;
+	// dpitch_before = dpitch;
 
 	// status
 	ptamIsGood = state->ptamState == state->PTAM_BEST || state->ptamState == state->PTAM_GOOD || state->ptamState == state->PTAM_TOOKKF;
@@ -176,14 +226,14 @@ ControlCommand DroneController::update(tum_ardrone::filter_stateConstPtr state)
 	// if(aux)
     // {
 	//   double time = getMS()/1000.0;
-    //    target.pos[0] = sin(0.8*time);
+    //    target.pos[0] = 0.5*sin(0.8*time);
 	// //  target.pos[0] = 0;
 	//    target.pos[1] = sin(0.4*time);
 	// //    target.pos[1] = 0;
 	//    target.pos[2] = 0.7 + 0.5*sin(0.4*time);
 	// //  target.pos[2] = 0.7;
-	// //   target.yaw = (-3.14/12)*sin(0.4*time)*180/3.141592;
-	//    target.yaw = 0;
+	//   target.yaw = (-3.14/12)*sin(0.4*time)*180/3.141592;
+	// //    target.yaw = 0;
 	// }
 
 	// Teste do circulo
@@ -343,7 +393,6 @@ ControlCommand DroneController::update(tum_ardrone::filter_stateConstPtr state)
 //     }
 //    }
 
-
 	// publisher
     geometry_msgs::Twist msg;
 	msg.linear.x = target.pos[0];
@@ -351,6 +400,11 @@ ControlCommand DroneController::update(tum_ardrone::filter_stateConstPtr state)
 	msg.linear.z = target.pos[2];
 	msg.angular.z = target.yaw;
 	setpoint_pub.publish(msg);
+
+	geometry_msgs::Twist derivative_msg;
+	derivative_msg.angular.x = droll*180/3.141592;
+	derivative_msg.angular.y = dpitch*180/3.141592;
+	derivative_pub.publish(derivative_msg);
 
 	// calculate (new) errors.
 	TooN::Vector<4> new_err = TooN::makeVector(
@@ -387,7 +441,7 @@ ControlCommand DroneController::update(tum_ardrone::filter_stateConstPtr state)
 	new_int_err[3]+= new_err[3]*e;
 
 	// Update timestamp
-	// lastTimeStamp = getMS()/1000.0;
+	lastTimeStamp = getMS()/1000.0;
 
 	// calculate state vector 2
 	TooN::Vector<> states(16);
@@ -780,7 +834,14 @@ void DroneController::calcControl(double yaw, TooN::Vector<16> states, TooN::Vec
 	// vector_k11 = TooN::makeVector(0, 0, -1.51, -0.97, 2.74, 0.59, 0, 0, 0, 0, 0, 0, 0, 1.04, 0, 0); //fase8 - nova ident roll e pitch
     
 	// gazebo
-	vector_k11 = TooN::makeVector(0, 0, -1.5467, -1.0066, 1.9519, 0.3311, 0, 0, 0, 0, 0, 0, 0, 1.0954, 0, 0); //fase9
+	// vector_k11 = TooN::makeVector(0, 0, -1.5467, -1.0066, 1.9519, 0.3311, 0, 0, 0, 0, 0, 0, 0, 1.0954, 0, 0); //fase9
+	// vector_k11 = TooN::makeVector(0, 0, -1.494, -0.980, 1.907, 0.324, 0, 0, 0, 0, 0, 0, 0, 1.044, 0, 0); //fase10
+	// vector_k11 = TooN::makeVector(0, 0, -0.6, -0.54, 1.06, 0.20, 0, 0, 0, 0, 0, 0, 0, 0.28, 0, 0); //altern_1
+	// vector_k11 = TooN::makeVector(0, 0, -0.96, -0.74, 1.44, 0.25, 0, 0, 0, 0, 0, 0, 0, 0.56, 0, 0); //altern_2
+
+	// teste apos ajuste das derivadas
+	// vector_k11 = TooN::makeVector(0, 0, -3.12, -1.59, 3.06, 0.47, 0, 0, 0, 0, 0, 0, 0, 2.86, 0, 0); //fase11_test4
+	vector_k11 = TooN::makeVector(0, 0, -3.48, -1.71, 3.28, 0.49, 0, 0, 0, 0, 0, 0, 0, 3.30, 0, 0); //fase11_test5_circulo
 
 	// roll
 	TooN::Vector<> vector_k21(16);
@@ -803,7 +864,14 @@ void DroneController::calcControl(double yaw, TooN::Vector<16> states, TooN::Vec
 	// vector_k21 = TooN::makeVector(1.88, 0.97, 0, 0, 0, 0, 1.56, 0.04, 0, 0, 0, 0, -1.53, 0, 0, 0); //fase7 - teste1 - x - roll
 	// vector_k21 = TooN::makeVector(1.46, 0.81, 0, 0, 0, 0, 2.19, 0.34, 0, 0, 0, 0, -1.09, 0, 0, 0); //fase8 - teste1 - x - roll
 
-	vector_k21 = TooN::makeVector(1.3912, 0.7963, 0, 0, 0, 0, 1.3262, 0.0328, 0, 0, 0, 0, -1.0000, 0, 0, 0); //fase9
+	// vector_k21 = TooN::makeVector(1.5272, 0.8990, 0, 0, 0, 0, 1.9359, 0.3119, 0, 0, 0, 0, -1.0541, 0, 0, 0); //fase9
+	// vector_k21 = TooN::makeVector(1.475, 0.878, 0, 0, 0, 0, 1.892, 0.306, 0, 0, 0, 0, -1.005, 0, 0, 0); //fase10
+	// vector_k21 = TooN::makeVector(0.65, 0.50, 0, 0, 0, 0, 1.09, 0.19, 0, 0, 0, 0, -0.31, 0, 0, 0); //altern_1
+	// vector_k21 = TooN::makeVector(1.03, 0.69, 0, 0, 0, 0, 1.49, 0.25, 0, 0, 0, 0, -0.61, 0, 0, 0); //altern_2
+
+	// vector_k21 = TooN::makeVector(3.63, 1.64, 0, 0, 0, 0, 3.43, 0.49, 0, 0, 0, 0, -3.44, 0, 0, 0); //fase11_test4
+	vector_k21 = TooN::makeVector(4.04, 1.77, 0, 0, 0, 0, 3.68, 0.51, 0, 0, 0, 0, -3.96, 0, 0, 0); //fase11_test5_circulo
+
 
 	// Z
 	TooN::Vector<> vector_k31(16);

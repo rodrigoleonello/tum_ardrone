@@ -17,6 +17,7 @@ find_package(catkin REQUIRED COMPONENTS
   message_generation
   roscpp
   rospy
+  gram_savitzky_golay
 )
 
 # Compile third party libs
@@ -168,6 +169,7 @@ set(AUTOPILOT_HEADER_FILES
 # build!
 add_executable(drone_autopilot ${AUTOPILOT_SOURCE_FILES} ${AUTOPILOT_HEADER_FILES})
 target_link_libraries(drone_autopilot ${catkin_LIBRARIES})
+target_link_libraries(drone_autopilot gram_savitzky_golay)
 add_dependencies(drone_autopilot thirdparty ${PROJECT_NAME}_gencpp ${PROJECT_NAME}_gencfg)
 
 # ---------------------------- GUI --------------------------------------------------

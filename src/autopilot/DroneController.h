@@ -22,12 +22,12 @@
 #define __DRONECONTROLLER_H
  
  
- 
 #include "ros/ros.h"
 #include "TooN/se3.h"
 #include <queue>
 #include "geometry_msgs/Twist.h"
 #include "tum_ardrone/filter_state.h"
+#include <gram_savitzky_golay/gram_savitzky_golay.h>
 
 class ControlNode;
 
@@ -72,8 +72,13 @@ private:
 
 	double droll;
 	double dpitch;
+	double droll_before;
+	double dpitch_before;
 	double roll_before;
 	double pitch_before;
+
+	std::vector<double> roll_queue;
+	std::vector<double> pitch_queue;
 
     //test quadratic signal
 	double aux_yaw;
@@ -92,6 +97,8 @@ private:
     ros::NodeHandle nh_;
     ros::Publisher setpoint_pub;
 	std::string setpoint_channel;
+	ros::Publisher derivative_pub;
+	std::string derivative_channel;
 
 	
 	TooN::Vector<4> new_int_err;

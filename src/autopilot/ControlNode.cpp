@@ -71,13 +71,13 @@ ControlNode::ControlNode()
 	lastControlSentMS = 0;
 
 	// channels
-	dronepose_sub = nh_.subscribe(dronepose_channel, 10, &ControlNode::droneposeCb, this);
-	vel_pub	   = nh_.advertise<geometry_msgs::Twist>(control_channel,1);
-	tum_ardrone_pub	   = nh_.advertise<std_msgs::String>(command_channel,50);
-	tum_ardrone_sub	   = nh_.subscribe(command_channel,50, &ControlNode::comCb, this);
-	takeoff_pub	   = nh_.advertise<std_msgs::Empty>(takeoff_channel,1);
-	land_pub	   = nh_.advertise<std_msgs::Empty>(land_channel,1);
-	toggleState_pub	   = nh_.advertise<std_msgs::Empty>(toggleState_channel,1);
+	dronepose_sub = nh_.subscribe(dronepose_channel, 100, &ControlNode::droneposeCb, this);
+	vel_pub	   = nh_.advertise<geometry_msgs::Twist>(control_channel,100);
+	tum_ardrone_pub	   = nh_.advertise<std_msgs::String>(command_channel,100);
+	tum_ardrone_sub	   = nh_.subscribe(command_channel,100, &ControlNode::comCb, this);
+	takeoff_pub	   = nh_.advertise<std_msgs::Empty>(takeoff_channel,100);
+	land_pub	   = nh_.advertise<std_msgs::Empty>(land_channel,100);
+	toggleState_pub	   = nh_.advertise<std_msgs::Empty>(toggleState_channel,100);
 
 	// services handler
 	setReference_ = nh_.advertiseService("drone_autopilot/setReference", &ControlNode::setReference, this);
@@ -97,7 +97,7 @@ ControlNode::ControlNode()
 	parameter_InitialReachDist = 0.2;
 	// parameter_InitialReachDist = 0;
 	parameter_StayWithinDist = 0.5;
-	// parameter_StayWithinDist = 0.1;
+	// parameter_StayWithinDist = 0;
 	parameter_StayTime = 2;
 	// parameter_StayTime = 0;
 	isControlling = false;
