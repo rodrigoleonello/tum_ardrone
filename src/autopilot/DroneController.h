@@ -127,9 +127,6 @@ private:
 	// void calcControl(double yaw, TooN::Vector<12> states);
 	void calcControl(double yaw, TooN::Vector<16> states, TooN::Vector<4> new_err);
 
-	// LQR + PID
-	// void calcControl(double yaw, TooN::Vector<16> states, TooN::Vector<4> new_err, TooN::Vector<4> d_error);
-
 public:
 
 	// generates and sends a new control command to the drone, based on the currently active command ant the drone's position.

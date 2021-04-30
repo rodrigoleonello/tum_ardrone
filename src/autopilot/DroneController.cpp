@@ -147,7 +147,7 @@ double angleFromTo2(double angle, double min, double sup)
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-// LQR update1
+// LQR update
 ControlCommand DroneController::update(tum_ardrone::filter_stateConstPtr state)
 {
 	// pose
@@ -223,28 +223,28 @@ ControlCommand DroneController::update(tum_ardrone::filter_stateConstPtr state)
 	scaleAccuracy = state->scaleAccuracy;
 
 	// Teste do 8
-	// if(aux)
-    // {
-	//   double time = getMS()/1000.0;
-    //    target.pos[0] = 0.5*sin(0.8*time);
-	// //  target.pos[0] = 0;
-	//    target.pos[1] = sin(0.4*time);
-	// //    target.pos[1] = 0;
-	//    target.pos[2] = 0.7 + 0.5*sin(0.4*time);
-	// //  target.pos[2] = 0.7;
-	//   target.yaw = (-3.14/12)*sin(0.4*time)*180/3.141592;
-	// //    target.yaw = 0;
-	// }
-
-	// Teste do circulo
 	if(aux)
     {
 	  double time = getMS()/1000.0;
-      target.pos[0] = 0.8*sin(0.8*time);
-	  target.pos[1] = 0.8*cos(0.8*time);
-	  target.pos[2] = 0.7;
-	  target.yaw = 0;
+       target.pos[0] = 0.5*sin(0.8*time);
+	//  target.pos[0] = 0;
+	   target.pos[1] = sin(0.4*time);
+	//    target.pos[1] = 0;
+	   target.pos[2] = 0.7 + 0.5*sin(0.4*time);
+	//  target.pos[2] = 0.7;
+	  target.yaw = (-3.14/12)*sin(0.4*time)*180/3.141592;
+	//    target.yaw = 0;
 	}
+
+	// Teste do circulo
+	// if(aux)
+    // {
+	//   double time = getMS()/1000.0;
+    //   target.pos[0] = 0.8*sin(0.8*time);
+	//   target.pos[1] = 0.8*cos(0.8*time);
+	//   target.pos[2] = 0.7;
+	//   target.yaw = 0;
+	// }
 
 	// Teste sen() em Z
 	// if(aux)
@@ -476,145 +476,6 @@ ControlCommand DroneController::update(tum_ardrone::filter_stateConstPtr state)
 	return lastSentControl;
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-// LQR update2 - LQR + PID
-// ControlCommand DroneController::update(tum_ardrone::filter_stateConstPtr state)
-// {
-// 	// pose
-// 	TooN::Vector<3> position = TooN::makeVector(state->x, state->y, state->z);
-// 	TooN::Vector<3> pose = TooN::makeVector((state->roll)*3.141592/180, (state->pitch)*3.141592/180, (state->yaw)*3.141592/180);
-//     double yaw = state->yaw;
-
-// 	TooN::Vector<4> speeds = TooN::makeVector(state->dx, state->dy, state->dz, state->dyaw);
-
-// 	// velocity
-// 	TooN::Vector<3> speed_position = TooN::makeVector(state->dx, state->dy, state->dz);
-
-// 	// estimate Derivative using function
-// 	// df(x)/dx~=(f(x)-f(x-1))/e
-// 	// double e = getMS()/1000.0 - lastTimeStamp; 
-// 	double e = 0.032;
-// 	droll = (pose[0] - roll_before)/e;
-// 	dpitch = (pose[1] - pitch_before)/e;
-
-// 	//make vector
-// 	TooN::Vector<3> speed_pose = TooN::makeVector(droll, dpitch, (state->dyaw)*3.141592/180);
-// 	// std::cout<<"state_derivada_yaw"<<state->dyaw<<std::endl;
-
-//     roll_before = (state->roll)*3.141592/180;
-// 	pitch_before = (state->pitch)*3.141592/180;
-
-// 	// status
-// 	ptamIsGood = state->ptamState == state->PTAM_BEST || state->ptamState == state->PTAM_GOOD || state->ptamState == state->PTAM_TOOKKF;
-// 	scaleAccuracy = state->scaleAccuracy;
-
-// 	// calculate (new) errors.
-// 	TooN::Vector<4> new_err = TooN::makeVector(
-// 		target.pos[0] - position[0],
-// 		target.pos[1] - position[1],
-//  		target.pos[2] - position[2],
-//  		(target.yaw)*3.141592/180 - pose[2]
-// 		);
-
-//     std::cout<<"new_erro0_"<<new_err[0]<<std::endl;
-// 	std::cout<<"new_erro1_"<<new_err[1]<<std::endl;
-// 	std::cout<<"new_erro2_"<<new_err[2]<<std::endl;
-// 	std::cout<<"new_erro3_"<<new_err[3]<<std::endl;
-
-// 	std::cout<<"passo_de_tempo"<<e<<std::endl;
-
-
-// 	// yaw needs special attention, it can always be pushed in between 180 and -180.
-// 	// this does not affect speeds and makes the drone always take the quickest rotation side.
-// 	new_err[3] = angleFromTo2(new_err[3],-3.141592,3.141592);
-//     TooN::Vector<4> d_err = TooN::makeVector(-speeds[0], -speeds[1], -speeds[2], -speeds[3]);
-
-//     // calculate state vector
-// 	//  TooN::Vector<> states(12);
-// 	//  states = TooN::makeVector(
-// 	//  	new_err[0],
-// 	//  	speed_position[0],
-// 	//  	new_err[1],
-// 	//  	speed_position[1],
-// 	//  	pose[1],
-// 	//  	speed_pose[1],
-// 	//  	pose[0],
-// 	//   	speed_pose[0],
-// 	//  	new_err[2],
-// 	//  	speed_position[2],
-// 	//  	new_err[3],
-// 	//  	speed_pose[2]
-// 	//      );
-
-// 	new_int_err[0]+= new_err[0]*e;
-// 	new_int_err[1]+= new_err[1]*e;
-// 	new_int_err[2]+= new_err[2]*e;
-// 	new_int_err[3]+= new_err[3]*e;
-
-//     // for(int i=0;i<4;i++)
-// 	// {
-// 	//   if(new_err[i]*e < 0 && new_int_err[i] > 0)
-//     //     new_int_err[i] = std::max(0.0, new_int_err[i] + 2.5 * new_err[i]*e);
-//     //   else if(new_err[i]*e > 0 && new_int_err[i] < 0)
-//     //     new_int_err[i] = std::min(0.0, new_int_err[i] + 2.5 * new_err[i]*e);
-//     //   else
-//     //     new_int_err[i] += new_err[i]*e;
-    
-//     //   if(new_int_err[i] > 20) new_int_err[i] =  20;
-//     //   if(new_int_err[i] < -20) new_int_err[i] =  -20;
-
-// 	//   new_int_err[i] = (0.01)*new_err[i];
-// 	// }
-// 	// for(int i=0;i<4;i++)
-//  	// { 
-// 	//   if(targetNew[i] > 0.5 && getMS()/1000.0 - targetSetAtClock > 0.1 && last_err[i] * new_err[i] < 0)
-//  	//   {
-// 	//   	new_int_err[i] = 0;
-// 	//     targetNew[i] = 0;
-// 	//   }
-// 	// }
-
-// 	std::cout<<"yaw_erro_int "<<new_int_err[3]<<std::endl;
-//     std::cout<<"x_erro_int "<<new_int_err[0]<<std::endl;
-// 	std::cout<<"y_erro_int "<<new_int_err[1]<<std::endl;
-// 	std::cout<<"z_erro_int "<<new_int_err[2]<<std::endl;
-
-// 	// Update timestamp
-// 	// lastTimeStamp = getMS()/1000.0;
-
-// 	// calculate state vector 2
-// 	TooN::Vector<> states(16);
-// 	states = TooN::makeVector(
-// 		position[0],
-// 		speed_position[0],
-// 		position[1],
-// 		speed_position[1],
-// 		pose[1],
-// 		speed_pose[1],
-// 		pose[0],
-// 		speed_pose[0],
-// 		position[2],
-// 		speed_position[2],
-// 		pose[2],
-// 		speed_pose[2],
-// 		new_int_err[0],
-// 		new_int_err[1],
-// 		new_int_err[2],
-// 		new_int_err[3]
-// 	   );
-
-// 	if(targetValid)
-// 		calcControl(yaw, states, new_err, d_err);
-// 	else
-// 	{
-// 		lastSentControl = hoverCommand;
-// 		ROS_WARN("Warning: no valid target, sending hover.");
-// 	}
-
-//     last_err = new_err;
-// 	return lastSentControl;
-// }
 
 void DroneController::setTarget(DronePosition newTarget)
 {
@@ -807,11 +668,9 @@ void i_term_increase(double& i_term, double new_err, double cap)
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-
 //LQR calcControl 1
 void DroneController::calcControl(double yaw, TooN::Vector<16> states, TooN::Vector<4> new_err)
 {
-
 	// pitch
     TooN::Vector<> vector_k11(16);
 	// vector_k11 = TooN::makeVector(0, 0, 12.24, -2.49, 2.77, 0.09, 0, 0, 0, 0, 0, 0); //original
@@ -832,7 +691,7 @@ void DroneController::calcControl(double yaw, TooN::Vector<16> states, TooN::Vec
 	// vector_k11 = TooN::makeVector(0, 0, -1.44, -0.96, 1.87, 0.32, 0, 0, 0, 0, 0, 0, 0, 1.0, 0, 0);
 	// vector_k11 = TooN::makeVector(0, 0, -1.59, -0.98, 1.90, 0.32, 0, 0, 0, 0, 0, 0, 0, 1.04, 0, 0); //fase7 - teste1 - y - pitch!!!
 	// vector_k11 = TooN::makeVector(0, 0, -1.51, -0.97, 2.74, 0.59, 0, 0, 0, 0, 0, 0, 0, 1.04, 0, 0); //fase8 - nova ident roll e pitch
-    
+
 	// gazebo
 	// vector_k11 = TooN::makeVector(0, 0, -1.5467, -1.0066, 1.9519, 0.3311, 0, 0, 0, 0, 0, 0, 0, 1.0954, 0, 0); //fase9
 	// vector_k11 = TooN::makeVector(0, 0, -1.494, -0.980, 1.907, 0.324, 0, 0, 0, 0, 0, 0, 0, 1.044, 0, 0); //fase10
@@ -872,7 +731,6 @@ void DroneController::calcControl(double yaw, TooN::Vector<16> states, TooN::Vec
 	// vector_k21 = TooN::makeVector(3.63, 1.64, 0, 0, 0, 0, 3.43, 0.49, 0, 0, 0, 0, -3.44, 0, 0, 0); //fase11_test4
 	vector_k21 = TooN::makeVector(4.04, 1.77, 0, 0, 0, 0, 3.68, 0.51, 0, 0, 0, 0, -3.96, 0, 0, 0); //fase11_test5_circulo
 
-
 	// Z
 	TooN::Vector<> vector_k31(16);
 	// vector_k31 = TooN::makeVector(0, 0, 0, 0, 0, 0, 0, 0, 12.247, -3.33, 0, 0);
@@ -892,7 +750,6 @@ void DroneController::calcControl(double yaw, TooN::Vector<16> states, TooN::Vec
     // vector_k31 = TooN::makeVector(0, 0, 0, 0, 0, 0, 0, 0, -0.88, -0.39, 0, 0, 0, 0, 0.20, 0);
 	vector_k31 = TooN::makeVector(0, 0, 0, 0, 0, 0, 0, 0, -5.15, -1.6, 0, 0, 0, 0, 4.47, 0);
 
-
     // psi
     TooN::Vector<> vector_k41(16);
 	// vector_k41 = TooN::makeVector(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -12.24, 0.64);
@@ -910,7 +767,6 @@ void DroneController::calcControl(double yaw, TooN::Vector<16> states, TooN::Vec
 	// vector_k41 = TooN::makeVector(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.45, 0.035, 0, 0, 0, -0.16);
 	// vector_k41 = TooN::makeVector(0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0088, 0.0027, 0.0000, 0.0000, 0.0000, -0.0100);
     vector_k41 = TooN::makeVector(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.60, 0.04, 0, 0, 0, -0.27);
-
 
 	// YAW
 	// if(vector_k41*states > 1 || vector_k41*states < -1)
@@ -954,126 +810,7 @@ void DroneController::calcControl(double yaw, TooN::Vector<16> states, TooN::Vec
 	// std::cout<<"gaz_cmd"<<lastSentControl.gaz<<std::endl;
 	// lastSentControl.gaz = std::min(max_gaz_rise,std::max(max_gaz_drop,(double)lastSentControl.gaz));
 	// if(lastSentControl.gaz > 0) lastSentControl.gaz *= rise_fac;
-
 }
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-//LQR calcControl2 - LQR + PID
-// void DroneController::calcControl(double yaw, TooN::Vector<16> states, TooN::Vector<4> new_err, TooN::Vector<4> d_error)
-// {
-
-// 	// pitch
-//     TooN::Vector<> vector_k11(16);
-// 	// vector_k11 = TooN::makeVector(0, 0, 12.24, -2.49, 2.77, 0.09, 0, 0, 0, 0, 0, 0); //original
-// 	// vector_k11 = TooN::makeVector(0, 0, 12.24, -2.49, 2.77, 0.09, 0, 0, 0, 0, 0, 0); // yaw suave
-// 	// vector_k11 = TooN::makeVector(0, 0, 0.387, -0.120, 0.172, 0.006, 0, 0, 0, 0, 0, 0); // todos suaves
-// 	// vector_k11 = TooN::makeVector(0, 0, 38.72, -6.28, 5.76, 0.17, 0, 0, 0, 0, 0, 0); // roll/pitch agressivo
-// 	// vector_k11 = TooN::makeVector(0, 0, -18.31, -3.06, 3.20, 0.10, 0, 0, 0, 0, 0, 0, 0, 34.64, 0, 0); // fase2 - teste1 - ação integral (muito ruim)
-// 	// vector_k11 = TooN::makeVector(0, 0, -6.99, -1.43, 1.71, 0.06, 0, 0, 0, 0, 0, 0, 0, 8.94, 0, 0); // fase2 - teste2 - ação integral (ruim)
-// 	// vector_k11 = TooN::makeVector(0, 0, 10, -2.11, 2.41, 0.083, 0, 0, 0, 0, 0, 0); // fase2 - teste3 - razoavel (não alcança setpoint tão bem)
-// 	// vector_k11 = TooN::makeVector(0, 0, -0.78, -0.22, 0.31, 0.011, 0, 0, 0, 0, 0, 0, 0, 0.28, 0, 0); // fase2 - teste4 - ação integral (melhor desempenho)
-// 	// vector_k11 = TooN::makeVector(0, 0, -0.78, -0.22, 0.31, 0.011, 0, 0, 0, 0, 0, 0, 0, 0.28, 0, 0); // fase2 - teste5 - mesmo que o anterior, com Z um pouco mais suave (mas nao o suficiente)
-// 	// vector_k11 = TooN::makeVector(0, 0, -2.38, -0.79, 2.47, 0.73, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0); // fase3 - teste1 - muito ruim, angulos agressivos e Z sem conseguir seguir referência (sinais saturados)
-// 	// vector_k11 = TooN::makeVector(0, 0, -4.5, -1.04, 1.48, 0.06, 0, 0, 0, 0, 0, 0, 0, 4.47, 0, 0); // fase3 - teste2 - muito ruim, assim como o anterior
-// 	vector_k11 = TooN::makeVector(0, 0, -0.78, -0.22, 0.31, 0.011, 0, 0, 0, 0, 0, 0, 0, 0.28, 0, 0); // fase4 - teste1 - ação intergral com Z sem saturar
-
-// 	// roll
-// 	TooN::Vector<> vector_k21(16);
-// 	// vector_k21 = TooN::makeVector(-12.24, 3.40, 0, 0, 0, 0, 3.73, 0.08, 0, 0, 0, 0);
-// 	// vector_k21 = TooN::makeVector(-12.24, 3.40, 0, 0, 0, 0, 3.73, 0.08, 0, 0, 0, 0);
-// 	// vector_k21 = TooN::makeVector(-0.387, 0.235, 0, 0, 0, 0, 0.380, 0.009, 0, 0, 0, 0);
-// 	// vector_k21 = TooN::makeVector(-38.72, 7.9, 0, 0, 0, 0, 6.92, 0.15, 0, 0, 0, 0);
-// 	// vector_k21 = TooN::makeVector(20.50, 4.42, 0, 0, 0, 0, 4.50, 0.10, 0, 0, 0, 0, -38.72, 0, 0, 0);
-// 	// vector_k21 = TooN::makeVector(7.62, 2.18, 0, 0, 0, 0, 2.62, 0.063, 0, 0, 0, 0, -10, 0, 0, 0);
-// 	// vector_k21 = TooN::makeVector(-10, 2.93, 0, 0, 0, 0, 3.33, 0.07, 0, 0, 0, 0);
-// 	// vector_k21 = TooN::makeVector(0.71, 0.37, 0, 0, 0, 0, 0.58, 0.014, 0, 0, 0, 0, -0.31, 0, 0, 0);
-// 	// vector_k21 = TooN::makeVector(0.71, 0.37, 0, 0, 0, 0, 0.58, 0.014, 0, 0, 0, 0, -0.31, 0, 0, 0);
-// 	// vector_k21 = TooN::makeVector(2.29, 1.29, 0, 0, 0, 0, 3.38, 0.68, 0, 0, 0, 0, -1, 0, 0, 0);
-// 	// vector_k21 = TooN::makeVector(4.43, 1.52, 0, 0, 0, 0, 2.13, 0.06, 0, 0, 0, 0, -4.47, 0, 0, 0);
-// 	vector_k21 = TooN::makeVector(0.71, 0.37, 0, 0, 0, 0, 0.58, 0.014, 0, 0, 0, 0, -0.31, 0, 0, 0);
-
-//     // psi
-//     TooN::Vector<> vector_k41(16);
-// 	// vector_k41 = TooN::makeVector(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -12.24, 0.64);
-// 	// vector_k41 = TooN::makeVector(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -0.38, 0.03);
-// 	// vector_k41 = TooN::makeVector(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -0.387, 0.030);
-// 	// vector_k41 = TooN::makeVector(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -0.387, 0.030);
-// 	// vector_k41 = TooN::makeVector(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.54, 0.04, 0, 0, 0, -0.22);
-// 	// vector_k41 = TooN::makeVector(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.54, 0.04, 0, 0, 0, -0.22);
-// 	// vector_k41 = TooN::makeVector(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -0.387, 0.030);
-// 	// vector_k41 = TooN::makeVector(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.54, 0.04, 0, 0, 0, -0.22);
-// 	// vector_k41 = TooN::makeVector(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.54, 0.04, 0, 0, 0, -0.22);
-// 	// vector_k41 = TooN::makeVector(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1.87, 0.63, 0, 0, 0, -1);
-// 	// vector_k41 = TooN::makeVector(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2.01, 0.17, 0, 0, 0, -2.23);
-// 	vector_k41 = TooN::makeVector(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.45, 0.035, 0, 0, 0, -0.15);
-	
-//     // gaz
-//     TooN::Vector<4> d_term = d_error;
-//   	TooN::Vector<4> p_term = new_err;	// p-term is error.
-    
-//   	// integrate & cap
-//   	double sec = getMS()/1000.0 - lastTimeStamp; lastTimeStamp = getMS()/1000.0;
-  	
-//   	i_term_increase(i_term[2],new_err[2] * sec, 0.2f / Ki_gaz);
-  
-//   	// kill integral term when first crossing target
-//   	// that is, thargetNew is set, it was set at least 100ms ago, and err changed sign.
-  	
-//   	if(targetNew[2] > 0.5 && getMS()/1000.0 - targetSetAtClock > 0.1 && last_err[2] * new_err[2] < 0)
-//   	{
-//   		i_term[2] = 0; targetNew[2] = 0;
-//   	}
-
-
-// 	// YAW
-// 	if(vector_k41*states > 1)
-// 	  new_int_err[3] = 0;
-// 	else if(vector_k41*states < -1)
-// 	  new_int_err[3] = 0;
-
-// 	lastSentControl.yaw = vector_k41*states;
-// 	std::cout<<"yaw_cmd"<<lastSentControl.yaw<<std::endl;
-// 	lastSentControl.yaw = std::min(max_yaw,std::max(-max_yaw,(double)(lastSentControl.yaw)));
-
-//     // rotate error to drone CS, invert pitch
-//    	// double yawRad = yaw * 2 * 3.141592 / 360;
-// 	double roll_cmd = vector_k21*states;
-// 	// roll_cmd = cos(yawRad)*roll_cmd - sin(yawRad)*roll_cmd;
-// 	double pitch_cmd = vector_k11*states;
-// 	// pitch_cmd = sin(yawRad)*pitch_cmd + cos(yawRad)*pitch_cmd;
-
-//     // ROLL and PITCH
-// 	if(roll_cmd > 1)
-// 	  new_int_err[1] = 0;
-// 	else if(roll_cmd < -1)
-// 	  new_int_err[1] = 0;
-// 	lastSentControl.roll = roll_cmd;
-// 	std::cout<<"roll_cmd"<<lastSentControl.roll<<std::endl;
-	
-// 	// if(pitch_cmd > 1)
-// 	//   new_int_err[0] = 0;
-// 	// else if(pitch_cmd < -1)
-// 	//   new_int_err[0] = 0;
-// 	lastSentControl.pitch = pitch_cmd;
-// 	std::cout<<"pitch_cmd"<<lastSentControl.pitch<<std::endl;
-// 	lastSentControl.roll = std::min(max_rp,std::max(-max_rp,(double)(lastSentControl.roll)));
-// 	lastSentControl.pitch = std::min(max_rp,std::max(-max_rp,(double)(lastSentControl.pitch)));
-
-// 	// GAZ
-	
-//     double gazP = Kp_gaz * p_term[2];
-// 	double gazD = Kd_gaz * d_term[2];
-// 	double gazI = Ki_gaz * i_term[2];
-
-//     std::cout<<"gaz_termo_integral"<<i_term[2]<<std::endl;
-
-// 	lastSentControl.gaz = gazP + gazD + gazI;
-// 	std::cout<<"gaz_cmd"<<lastSentControl.gaz<<std::endl;
-// 	lastSentControl.gaz = std::min(max_gaz_rise,std::max(max_gaz_drop,(double)lastSentControl.gaz));
-// 	// if(lastSentControl.gaz > 0) lastSentControl.gaz *= rise_fac;
-
-// }
 
 TooN::Vector<4> DroneController::getLastErr()
 {
