@@ -673,12 +673,6 @@ void DroneController::calcControl(double yaw, TooN::Vector<16> states, TooN::Vec
 {
 	// pitch
     TooN::Vector<> vector_k11(16);
-	// vector_k11 = TooN::makeVector(0, 0, 12.24, -2.49, 2.77, 0.09, 0, 0, 0, 0, 0, 0); //original
-	// vector_k11 = TooN::makeVector(0, 0, 12.24, -2.49, 2.77, 0.09, 0, 0, 0, 0, 0, 0); // yaw suave
-	// vector_k11 = TooN::makeVector(0, 0, 0.387, -0.120, 0.172, 0.006, 0, 0, 0, 0, 0, 0); // todos suaves
-	// vector_k11 = TooN::makeVector(0, 0, 38.72, -6.28, 5.76, 0.17, 0, 0, 0, 0, 0, 0); // roll/pitch agressivo
-	// vector_k11 = TooN::makeVector(0, 0, -18.31, -3.06, 3.20, 0.10, 0, 0, 0, 0, 0, 0, 0, 34.64, 0, 0); // fase2 - teste1 - ação integral (muito ruim)
-	// vector_k11 = TooN::makeVector(0, 0, -6.99, -1.43, 1.71, 0.06, 0, 0, 0, 0, 0, 0, 0, 8.94, 0, 0); // fase2 - teste2 - ação integral (ruim)
 	// vector_k11 = TooN::makeVector(0, 0, 10, -2.11, 2.41, 0.083, 0, 0, 0, 0, 0, 0); // fase2 - teste3 - razoavel (não alcança setpoint tão bem)
 	// vector_k11 = TooN::makeVector(0, 0, -0.78, -0.22, 0.31, 0.011, 0, 0, 0, 0, 0, 0, 0, 0.28, 0, 0); // fase2 - teste4 - ação integral (melhor desempenho, porém sobressinal em Z)
 	// vector_k11 = TooN::makeVector(0, 0, -0.78, -0.22, 0.31, 0.011, 0, 0, 0, 0, 0, 0, 0, 0.28, 0, 0); // fase2 - teste5 - mesmo que o anterior, com Z um pouco mais suave
@@ -700,16 +694,22 @@ void DroneController::calcControl(double yaw, TooN::Vector<16> states, TooN::Vec
 
 	// teste apos ajuste das derivadas
 	// vector_k11 = TooN::makeVector(0, 0, -3.12, -1.59, 3.06, 0.47, 0, 0, 0, 0, 0, 0, 0, 2.86, 0, 0); //fase11_test4
-	vector_k11 = TooN::makeVector(0, 0, -3.48, -1.71, 3.28, 0.49, 0, 0, 0, 0, 0, 0, 0, 3.30, 0, 0); //fase11_test5_circulo
+	// vector_k11 = TooN::makeVector(0, 0, -3.48, -1.71, 3.28, 0.49, 0, 0, 0, 0, 0, 0, 0, 3.30, 0, 0); //fase11_test5_circulo
+
+	/////// Humberto
+	// LQR
+	// vector_k11 = TooN::makeVector(0, 0, -28.20, -11.81, 28.17, 3.44, 0, 0, 0, 0, 0, 0, 0, 31.62, 0, 0); 
+    // vector_k11 = TooN::makeVector(0, 0, -4.13, -1.95, 4.27, 0.62, 0, 0, 0, 0, 0, 0, 0, 4.08, 0, 0); 
+	// Hinf
+	// vector_k11 = TooN::makeVector(0, 0, -4.68, -2.29, 5.07, 0.69, 0, 0, 0, 0, 0, 0, 0, 3.72, 0, 0); // minimiza saída
+	// vector_k11 = TooN::makeVector(0, 0, -3.97, -1.74, 3.49, 0.47, 0, 0, 0, 0, 0, 0, 0, 3.45, 0, 0); // minimiza saída
+	// vector_k11 = TooN::makeVector(0, 0, -3.79, -1.69, 3.40, 0.46, 0, 0, 0, 0, 0, 0, 0, 3.28, 0, 0); // minimiza saída - bom resultado no gazebo
+	// vector_k11 = TooN::makeVector(0, 0, -7.62, -3.09, 6.15, 0.71, 0, 0, 0, 0, 0, 0, 0, 7.18, 0, 0); // minimiza saída e controle 
+    // Robusto
+	vector_k11 = TooN::makeVector(0, 0, -2.55, -2.93, 5.30, 0.95, 0, 0, 0, 0, 0, 0, 0, 1.19, 0, 0); //
 
 	// roll
 	TooN::Vector<> vector_k21(16);
-	// vector_k21 = TooN::makeVector(-12.24, 3.40, 0, 0, 0, 0, 3.73, 0.08, 0, 0, 0, 0);
-	// vector_k21 = TooN::makeVector(-12.24, 3.40, 0, 0, 0, 0, 3.73, 0.08, 0, 0, 0, 0);
-	// vector_k21 = TooN::makeVector(-0.387, 0.235, 0, 0, 0, 0, 0.380, 0.009, 0, 0, 0, 0);
-	// vector_k21 = TooN::makeVector(-38.72, 7.9, 0, 0, 0, 0, 6.92, 0.15, 0, 0, 0, 0);
-	// vector_k21 = TooN::makeVector(20.50, 4.42, 0, 0, 0, 0, 4.50, 0.10, 0, 0, 0, 0, -38.72, 0, 0, 0);
-	// vector_k21 = TooN::makeVector(7.62, 2.18, 0, 0, 0, 0, 2.62, 0.063, 0, 0, 0, 0, -10, 0, 0, 0);
 	// vector_k21 = TooN::makeVector(-10, 2.93, 0, 0, 0, 0, 3.33, 0.07, 0, 0, 0, 0);
 	// vector_k21 = TooN::makeVector(0.71, 0.37, 0, 0, 0, 0, 0.58, 0.014, 0, 0, 0, 0, -0.31, 0, 0, 0);
 	// vector_k21 = TooN::makeVector(0.71, 0.37, 0, 0, 0, 0, 0.58, 0.014, 0, 0, 0, 0, -0.31, 0, 0, 0);
@@ -729,16 +729,19 @@ void DroneController::calcControl(double yaw, TooN::Vector<16> states, TooN::Vec
 	// vector_k21 = TooN::makeVector(1.03, 0.69, 0, 0, 0, 0, 1.49, 0.25, 0, 0, 0, 0, -0.61, 0, 0, 0); //altern_2
 
 	// vector_k21 = TooN::makeVector(3.63, 1.64, 0, 0, 0, 0, 3.43, 0.49, 0, 0, 0, 0, -3.44, 0, 0, 0); //fase11_test4
-	vector_k21 = TooN::makeVector(4.04, 1.77, 0, 0, 0, 0, 3.68, 0.51, 0, 0, 0, 0, -3.96, 0, 0, 0); //fase11_test5_circulo
+	// vector_k21 = TooN::makeVector(4.04, 1.77, 0, 0, 0, 0, 3.68, 0.51, 0, 0, 0, 0, -3.96, 0, 0, 0); //fase11_test5_circulo
+
+	// vector_k21 = TooN::makeVector(27.94, 10.84, 0, 0, 0, 0, 27.68, 3.41, 0, 0, 0, 0, -31.62, 0, 0, 0); 
+	// vector_k21 = TooN::makeVector(4.13, 1.8, 0, 0, 0, 0, 4.21, 0.60, 0, 0, 0, 0, -4.08, 0, 0, 0); 
+    // vector_k21 = TooN::makeVector(4.58, 2.07, 0, 0, 0, 0, 4.93, 0.67, 0, 0, 0, 0, -3.64, 0, 0, 0);
+	// vector_k21 = TooN::makeVector(7.22, 2.58, 0, 0, 0, 0, 5.35, 0.57, 0, 0, 0, 0, -6.95, 0, 0, 0);  
+	// vector_k21 = TooN::makeVector(6.87, 2.50, 0, 0, 0, 0, 5.21, 0.56, 0, 0, 0, 0, -6.51, 0, 0, 0); 
+	// vector_k21 = TooN::makeVector(7.46, 2.83, 0, 0, 0, 0, 6.04, 0.68, 0, 0, 0, 0, -7.02, 0, 0, 0); 
+	vector_k21 = TooN::makeVector(2.80, 1.85, 0, 0, 0, 0, 5.39, 0.91, 0, 0, 0, 0, -1.36, 0, 0, 0); 
+
 
 	// Z
 	TooN::Vector<> vector_k31(16);
-	// vector_k31 = TooN::makeVector(0, 0, 0, 0, 0, 0, 0, 0, 12.247, -3.33, 0, 0);
-	// vector_k31 = TooN::makeVector(0, 0, 0, 0, 0, 0, 0, 0, 12.247, -3.33, 0, 0);
-	// vector_k31 = TooN::makeVector(0, 0, 0, 0, 0, 0, 0, 0, 0.387, -0.287, 0, 0);
-	// vector_k31 = TooN::makeVector(0, 0, 0, 0, 0, 0, 0, 0, 12.24, -3.33, 0, 0);
-	// vector_k31 = TooN::makeVector(0, 0, 0, 0, 0, 0, 0, 0, -8.19, -2.61, 0, 0, 0, 0, 10, 0);
-	// vector_k31 = TooN::makeVector(0, 0, 0, 0, 0, 0, 0, 0, -1.85, -0.98, 0, 0, 0, 0, 1, 0);
 	// vector_k31 = TooN::makeVector(0, 0, 0, 0, 0, 0, 0, 0, 1.224, -0.72, 0, 0);
 	// vector_k31 = TooN::makeVector(0, 0, 0, 0, 0, 0, 0, 0, -1.85, -0.98, 0, 0, 0, 0, 10, 0);
 	// vector_k31 = TooN::makeVector(0, 0, 0, 0, 0, 0, 0, 0, -1.85, -0.98, 0, 0, 0, 0, 1, 0);
@@ -748,16 +751,19 @@ void DroneController::calcControl(double yaw, TooN::Vector<16> states, TooN::Vec
 	// vector_k31 = TooN::makeVector(0, 0, 0, 0, 0, 0, 0, 0, -0.82, -0.53, 0, 0, 0, 0, 0.21, 0);
 	// vector_k31 = TooN::makeVector(0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, -0.8579, -0.3173, 0.0000, 0.0000, 0.0000, 0.0000, 1.0000, 0.0000);
     // vector_k31 = TooN::makeVector(0, 0, 0, 0, 0, 0, 0, 0, -0.88, -0.39, 0, 0, 0, 0, 0.20, 0);
-	vector_k31 = TooN::makeVector(0, 0, 0, 0, 0, 0, 0, 0, -5.15, -1.6, 0, 0, 0, 0, 4.47, 0);
+	// vector_k31 = TooN::makeVector(0, 0, 0, 0, 0, 0, 0, 0, -5.15, -1.6, 0, 0, 0, 0, 4.47, 0);
+
+	// vector_k31 = TooN::makeVector(0, 0, 0, 0, 0, 0, 0, 0, -10.36, -3.7, 0, 0, 0, 0, 10.00, 0);
+	// vector_k31 = TooN::makeVector(0, 0, 0, 0, 0, 0, 0, 0, -5.49, -1.99, 0, 0, 0, 0, 4.47, 0);
+	// vector_k31 = TooN::makeVector(0, 0, 0, 0, 0, 0, 0, 0, -5.85, -1.84, 0, 0, 0, 0, 3.66, 0);
+	// vector_k31 = TooN::makeVector(0, 0, 0, 0, 0, 0, 0, 0, -6.81, -1.24, 0, 0, 0, 0, 5.39, 0);
+	// vector_k31 = TooN::makeVector(0, 0, 0, 0, 0, 0, 0, 0, -6.81, -1.24, 0, 0, 0, 0, 5.39, 0);
+	// vector_k31 = TooN::makeVector(0, 0, 0, 0, 0, 0, 0, 0, -5.36, -1.36, 0, 0, 0, 0, 3.71, 0);
+	vector_k31 = TooN::makeVector(0, 0, 0, 0, 0, 0, 0, 0, -2.67, -0.71, 0, 0, 0, 0, 0.93, 0);
+
 
     // psi
     TooN::Vector<> vector_k41(16);
-	// vector_k41 = TooN::makeVector(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -12.24, 0.64);
-	// vector_k41 = TooN::makeVector(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -0.38, 0.03);
-	// vector_k41 = TooN::makeVector(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -0.387, 0.030);
-	// vector_k41 = TooN::makeVector(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -0.387, 0.030);
-	// vector_k41 = TooN::makeVector(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.54, 0.04, 0, 0, 0, -0.22);
-	// vector_k41 = TooN::makeVector(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.54, 0.04, 0, 0, 0, -0.22);
 	// vector_k41 = TooN::makeVector(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -0.387, 0.030);
 	// vector_k41 = TooN::makeVector(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.54, 0.04, 0, 0, 0, -0.22);
 	// vector_k41 = TooN::makeVector(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.54, 0.04, 0, 0, 0, -0.22);
@@ -766,7 +772,16 @@ void DroneController::calcControl(double yaw, TooN::Vector<16> states, TooN::Vec
 	// vector_k41 = TooN::makeVector(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.45, 0.035, 0, 0, 0, -0.15);
 	// vector_k41 = TooN::makeVector(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.45, 0.035, 0, 0, 0, -0.16);
 	// vector_k41 = TooN::makeVector(0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0088, 0.0027, 0.0000, 0.0000, 0.0000, -0.0100);
-    vector_k41 = TooN::makeVector(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.60, 0.04, 0, 0, 0, -0.27);
+    // vector_k41 = TooN::makeVector(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1.19, 0.08, 0, 0, 0, -1.00);
+
+	// vector_k41 = TooN::makeVector(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8.78, 2.72, 0, 0, 0, -10.00);
+	// vector_k41 = TooN::makeVector(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1.29, 0.16, 0, 0, 0, -1.00);
+	// vector_k41 = TooN::makeVector(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1.22, 0.22, 0, 0, 0, -0.94);
+	// vector_k41 = TooN::makeVector(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2.45, 0.22, 0, 0, 0, -2.46);
+	// vector_k41 = TooN::makeVector(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2.45, 0.22, 0, 0, 0, -2.46);
+	// vector_k41 = TooN::makeVector(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1.38, 0.22, 0, 0, 0, -1.15);
+	vector_k41 = TooN::makeVector(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1.01, 0.05, 0, 0, 0, -0.43);
+
 
 	// YAW
 	// if(vector_k41*states > 1 || vector_k41*states < -1)
@@ -790,7 +805,7 @@ void DroneController::calcControl(double yaw, TooN::Vector<16> states, TooN::Vec
 	lastSentControl.roll = roll_cmd;
 	// std::cout<<"roll_cmd"<<lastSentControl.roll<<std::endl;
 	// lastSentControl.roll = std::min(max_rp,std::max(-max_rp,(double)(lastSentControl.roll)));
-	
+
 	// if(pitch_cmd > 1 || pitch_cmd < -1)
 	// {
 	//   new_int_err[0] = 0.7 * new_int_err[0];
